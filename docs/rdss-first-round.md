@@ -1,6 +1,6 @@
 # 首轮 RDSS：实现与复现
 
-代码分支：`codex/rdss-first-round`，基于固定语义基线提交 `8f66b71299b6cc415f458ec8150a2d3efb6a43c7`。基线在本机 Git 缺少登录凭据、GitHub 连接器写入返回 403 的情况下尚未推送；相关提交已保存在服务器及本地 Git 镜像。
+代码分支：`codex/rdss-first-round`，基于固定语义基线提交 `8f66b71299b6cc415f458ec8150a2d3efb6a43c7`。基线已通过本机 Git 登录成功推送到 origin。首轮 RDSS 实现提交为 `a54f6d6a0ed914c1c37a50b7a8189e8f3a2b92ee`，本分支同步至 origin。
 
 ## 整体流程
 

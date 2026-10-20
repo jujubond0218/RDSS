@@ -161,7 +161,7 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 
 ## 首轮 RDSS 功能分支与复现
 
-用户于本轮明确授权提交并推送固定语义基线，再新开分支完成首轮 RDSS。基线提交 `8f66b71299b6cc415f458ec8150a2d3efb6a43c7` 位于 `codex/fixed-semantic-cache-baseline`；本轮分支为 `codex/rdss-first-round`。基线 push 暂被认证阻断：本机 Git 无凭据、已连接 GitHub 的写接口返回403；用户已收到认证说明，权限就绪后再正常push。不要把本地提交当作已推送。
+用户于本轮明确授权提交并推送固定语义基线，再新开分支完成首轮 RDSS。基线提交 `8f66b71299b6cc415f458ec8150a2d3efb6a43c7` 位于 `codex/fixed-semantic-cache-baseline`；本轮分支为 `codex/rdss-first-round`。基线已通过本机 Git Credential Manager 的 GitHub 设备登录推送成功。此前连接器写入403、Git未登录的问题已由本机Git登录解决。首轮RDSS实现提交为 `a54f6d6a0ed914c1c37a50b7a8189e8f3a2b92ee`；功能分支也按本轮要求同步至origin。
 
 本地另有用于同步 Git 的镜像 `C:\Users\Administrator\Documents\ChatGPT\毕设\tmp\rdss-sync`，origin与服务器相同。实际已有环境、数据和代码仍以服务器路径为准；镜像不含模型与数据。
 
@@ -172,3 +172,5 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 11项单元测试通过。完整Flowers-102、2463张、ViT-B/16、种子1结果：模板TDA71.4982%（1761），固定全量语义73.6500%（1814），动态相关性Top-k73.6906%（1815），完整RDSS73.2034%（1803）。RDSS相对固定纠正52、新增错误63，净少11张；原样保存本轮结果，不据此测试集反复找参数。
 
 服务器结果 `/root/autodl-tmp/project_R/runs/flowers_rdss_first_20261020_201102`，运行日志 `/root/autodl-tmp/project_R/logs/flowers_rdss_first_20261020.log`，本地results同名副本。方法、运行命令和结果见 `docs/rdss-first-round.md`。继续使用本文已有独立解释器和运行环境变量；入口复用已存Flowers视觉特征与描述向量，时间不包含重新编码。完整逐次选择在semantic_updates.jsonl，最终原句在final_selections.json。
+
+本机 Git Credential Manager 2.7.3 登录时，若设备授权请求长时间无响应，可对该次进程设置 `DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2SUPPORT=0` 再执行 `git credential-manager github login --username jujubond0218 --device --no-ui`。本次仅设置进程变量，没有修改系统网络配置。Git凭据由系统凭据管理器保管，不在项目或对话记录令牌，也不往服务器复制凭据；服务器可用已有SSH中转Git bundle同步。
