@@ -131,7 +131,7 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 
 ## 网络与项目边界
 
-此前服务器可访问 Caltech 数据站点、OpenAI 权重站点和 PyTorch 官方 wheel 源，但直连 GitHub HTTPS 超时，`/etc/network_turbo` 提示该地区不支持内置加速。网络状态应实测，不假定永久不可用。代码曾经本机 Git 克隆后经 SSH 中转，保留完整 `.git` 和个人仓库 origin；工作区只有本文件为新增文档，没有修改算法或提交、push。
+此前服务器可访问 Caltech 数据站点、OpenAI 权重站点和 PyTorch 官方 wheel 源，但直连 GitHub HTTPS 超时，`/etc/network_turbo` 提示该地区不支持内置加速。网络状态应实测，不假定永久不可用。代码曾经本机 Git 克隆后经 SSH 中转，保留完整 `.git` 和个人仓库 origin。后续已在功能分支实现固定语义缓存基线，并按用户要求提交AGENTS.md；当前状态见下方功能分支记录。
 
 若确需新增依赖，先检查现有依赖能力，只安装到上述独立环境，并同步依赖记录。不要盲目执行原始 `requirements.txt`、重新克隆仓库、重新下载已有数据或覆盖用户改动。
 
@@ -146,3 +146,13 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 先检查项目已有依赖，优先成熟且维护中的库；先研究成熟产品和已验证模式，不无故重写。架构决策考虑长期使用，不采用“先这样以后再换”的临时方案。
 
 没有用户明确要求，不修改代码、安装环境、提交或 push。当前已授权的数据准备、独立环境安装和本文档编写不等于授权未来任意变更；新任务按用户实际授权范围执行。
+
+## 固定语义缓存功能分支
+
+2026-10-20用户明确授权新建功能分支、修改代码并运行固定语义缓存基线，要求直接提交AGENTS.md。实际仓库分支为 `codex/fixed-semantic-cache-baseline`，起点main的e697fb0；现有AGENTS初次单独提交22063ca。功能代码保留在该分支工作区，不自动提交或push。
+
+新增 `semantic_cache.py`、`experiments/evaluate_fixed_semantic.py` 和 `tests/test_fixed_semantic.py`。模板原型保持不变，伪标签、熵和视觉缓存写入仅由模板分支驱动。每类100条已有单位文本向量等权平均并归一化，形成固定语义原型；两路文本均使用100倍相似度尺度。最终分数为模板TDA分数加eta乘语义分数，首次eta=1。没有动态筛选或修改原TDA源码，没有新依赖。
+
+4项单元测试通过，Flowers-102完整2463张配对评估完成。结果服务器目录 `/root/autodl-tmp/project_R/runs/flowers_fixed_semantic_20261020_194908`，本地results同名副本。模板TDA对照71.4982%（1761），固定语义基线73.6500%（1814），类别平均72.3345%。相对模板纠正92、损坏39，净多53张（+2.1518个百分点）。eta=0的2463条预测与此前模板TDA逐张一致；语义原型与此前100句融合原型逐元素一致；融合求和检查通过。之前74.4214%（1833）是替换模板的另一实验条件。
+
+复用ViT-B/16既有图像特征、种子1顺序、描述向量和原Flowers配置，不重复编码、不调用API、不安装环境。重放约5.98秒，总脚本约6.69秒，不含特征提取。保存metrics、逐样本预测、视觉缓存轨迹、各路logits、语义原型、输入与源码快照。运行入口为仓库内 `experiments/evaluate_fixed_semantic.py --semantic-weight 1`，使用已有独立解释器和本文的运行环境变量。说明见 `docs/flowers102-fixed-semantic-results.md`。
