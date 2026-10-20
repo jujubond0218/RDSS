@@ -1,0 +1,8 @@
+{
+  "base_url": "https://api.aijws.com/v1",
+  "model": "deepseek-v4.1-flash",
+  "api_key": "",
+  "temperature": 0.8,
+  "max_tokens": 4096,
+  "timeout_seconds": 120
+}

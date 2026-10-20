@@ -2,6 +2,8 @@
 
 ## 新会话先读
 
+当前总览与下一轮优化顺序先看 `docs/PROJECT_STATUS.md`。当前检查点分支 `codex/rdss-first-round`；用户明确要求先记录、提交、推送并清理工作区，再进行后续优化。论文继续围绕RDSS，不换题。本轮只归档已有工作，正式RDSS算法尚未执行下一轮优化。
+
 本地目录 `C:\Users\Administrator\Documents\ChatGPT\毕设` 用于组织对话，不是实验代码目录。实际代码和已安装环境均在 AutoDL 服务器。不要因为本地没有代码、当前 shell 显示 `(base)`，就重新克隆或安装。
 
 服务器连接：`ssh -p 46939 root@region-9.autodl.pro`。密码不写入文件；已有会话凭据可继续使用，否则向用户获取。服务器实例、端口或 GPU 可能变化，操作前核实连接目标。
@@ -174,3 +176,51 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 服务器结果 `/root/autodl-tmp/project_R/runs/flowers_rdss_first_20261020_201102`，运行日志 `/root/autodl-tmp/project_R/logs/flowers_rdss_first_20261020.log`，本地results同名副本。方法、运行命令和结果见 `docs/rdss-first-round.md`。继续使用本文已有独立解释器和运行环境变量；入口复用已存Flowers视觉特征与描述向量，时间不包含重新编码。完整逐次选择在semantic_updates.jsonl，最终原句在final_selections.json。
 
 本机 Git Credential Manager 2.7.3 登录时，若设备授权请求长时间无响应，可对该次进程设置 `DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2SUPPORT=0` 再执行 `git credential-manager github login --username jujubond0218 --device --no-ui`。本次仅设置进程变量，没有修改系统网络配置。Git凭据由系统凭据管理器保管，不在项目或对话记录令牌，也不往服务器复制凭据；服务器可用已有SSH中转Git bundle同步。
+
+## 人工属性错配噪声实验
+
+用户随后明确要求给描述库追加一些噪声并比较固定全量与RDSS。新增 `experiments/evaluate_semantic_noise.py`、`docs/flowers102-semantic-noise.md`；本轮源码、文档及AGENTS已随实验检查点归档。
+
+保持原库100条不动，以种子20261020从其他花类前20条概述取句，仅改类别名、保留供体属性；追加25/50条，形成嵌套的125/150条池。两个方法共用对应库，RDSS参数不变，每类冷启动均为该库全量均值。只编码新增5100句，不调用API、不安装环境。
+
+2463张结果：追加0/25/50条时，固定全量为73.6500%/73.8124%/73.6500%；RDSS为73.2034%/73.6500%/73.2846%。全量本轮没有下降。更新选句中的人工噪声占比11.35%/19.71%，相应池占比20%/33.33%。原库三路预测逐张复现首轮；CSV正确数与源码哈希复核通过。
+
+结果 `/root/autodl-tmp/project_R/runs/flowers_semantic_noise_20261020_202831`；日志 `/root/autodl-tmp/project_R/logs/flowers_semantic_noise_20261020.log`；本地results同名副本。库文件prompts_add25/50.json、来源noise_provenance.json、逐次筛选semantic_updates.jsonl均在结果目录，原始描述库没有覆盖。
+
+## PACS 最小连续域流
+
+用户随后要求从此前讨论的数据集选一个，依次跑最小TDA、TDA+全量、TDA+RDSS，并强调适合连续域变化。已选PACS，源镜像flwrlabs/pacs版本394113073258ead631f617d2e13bb377c0715c4b；191395900字节Parquet与该镜像公布的LFS SHA256 4fc041ee92eec6043fe6e2859e8bdd138e5f958bc621afd153879812cbe65ff5一致，位于downloads/pacs_39411307.parquet。
+
+数据 `/root/autodl-tmp/project_R/data/pacs_minimal`，700张唯一图片，照片→油画→卡通→素描→照片，各阶段140张、每类20张，种子1，照片重现使用另一批图片，域切换不清缓存。准备脚本experiments/prepare_pacs_minimal.py使用已存在PyArrow的 `/root/miniconda3/bin/python`，只执行一次，不装新包。推理脚本experiments/evaluate_pacs_minimal.py继续用已有独立环境和本文运行变量。
+
+描述脚本experiments/pacs_description_bank.py在当前对话编写固定素材，四域各25条/类，共每类100条（20概述60细节20对比），未调用API或观察测试图像改写。运行参数完全沿用首轮RDSS；TDA沿用Flowers配置。域信息只用于排流和事后统计，不输入RDSS。
+
+结果 `/root/autodl-tmp/project_R/runs/pacs_minimal_shift_20261020_210546`，本地results同名副本。28张TDA冒烟28/28；700张总成绩TDA97.2857%（681）、全量97.5714%（683）、RDSS97.1429%（680）。素描阶段87.86%/88.57%/89.29%。RDSS选句会随域变化，但素描切换较慢；行为统计和各阶段成绩详见docs/pacs-minimal-shift.md。数据/源码/CSV核对通过。相关源码、文档与AGENTS已随实验检查点归档。
+
+## NICO++ 最小连续上下文流
+
+用户要求运行NICO++最小集合。原发布Dropbox/清华链接不可用，使用公开重组子集2018LZY/NICOplusplus，版本66bea9905018646633b3c3664027e7e80cdcb687，包含20类、六上下文。源ZIP1374607687字节，SHA256 c5531759655342b7adf8b2ede51a97954e8114816106d64a100ed6774bd3eafa与镜像LFS一致，位于downloads/nico_66bea990.zip。
+
+正式数据 `/root/autodl-tmp/project_R/data/nico_minimal`，20类全部保留，每类每阶段8张，grass→water→rock→autumn→dim→outdoor→grass，共1120张内容哈希不重复，种子1，回归草地换新图，不重置缓存。初次10张方案因秋季dolphin仅8张而在推理前停止，半成品在data/nico_minimal_incomplete_20261020，不能当正式数据使用。准备脚本experiments/prepare_nico_minimal.py使用已有独立环境，无新增依赖。
+
+experiments/nico_description_bank.py为当前对话编写的静态素材和模板组合，每类100条，共2000条（20通用、60六上下文细节、20类别对比），未调用API；是基础素材的变体，不是每类100条独立生成事实。实验入口experiments/evaluate_nico_minimal.py，复用ViT-B/16及既有TDA/RDSS参数，语义权重1。三方法共用池与顺序，域标签不输入筛选。
+
+28张冒烟24/28；1120张TDA92.5893%（1037）、全量93.2143%（1044）、RDSS92.5000%（1036）。RDSS相对全量纠正3、新增错误11，净少8。源数据/抽样平衡/唯一哈希/配对预测/源码和CSV核对通过。
+
+服务器结果 `/root/autodl-tmp/project_R/runs/nico_minimal_shift_20261020_220735`，日志 `/root/autodl-tmp/project_R/logs/nico_minimal_shift_20261020.log`；本地results同名副本。方法与各阶段成绩见docs/nico-minimal-shift.md。相关源码、文档与AGENTS已随实验检查点归档。
+
+## RDSS 原因诊断
+
+用户要求分析此前实验为何落后全量。正式rdss.py等算法文件保持不变，另用已保存特征、相同TDA门控、相同参数做事后组件重放，原始融合logits逐项精确复现。主结果 `/root/autodl-tmp/project_R/runs/rdss_diagnosis_20261020_223013`，包含domain_components/的PACS/NICO额外拆分；本地results同名副本。报告docs/rdss-diagnosis.md。
+
+相关性+冗余（判别性权重0）Flowers73.9748%（1822），高于全量73.6500%（1814）；NICO93.4821%（1047），高于全量93.2143%（1044）。完整RDSS为1803/1036，当前判别性项分别造成相对无判别项少19/11张。PACS各增强选择680，仍低于全量683。语义分支单独准确率也较固定原型下降，优先检查筛选本身。
+
+NICO切换后的前35张，真类锚点新阶段证据占比仅4.61%～8.76%，末35张43.78%～54.99%，表明队列32/衰减0.9相对每阶段每类8张过慢。Flowers追加50噪声的全量原型平均偏转4.472°，RDSS最终相对全量偏转12.160°。重设判别性、快慢证据分工和控制语义替换幅度是建议，尚未改正式算法。诊断入口为experiments/diagnostics/diagnose_rdss.py，历史快照保留在结果目录中，诊断源码、报告与AGENTS已随实验检查点归档。
+
+## 实验检查点归档
+
+本轮用户明确授权归档当前进度与问题、提交并push，保持干净检查点。源码、描述配置/示例、测试与研究文档统一归档到实际仓库codex/rdss-first-round；私有配置、原始数据、模型、结果大文件、运行缓存均由.gitignore排除。
+
+本地顶层目录用于对话与暂存，源码/文档的规范副本在实际仓库及tmp/rdss-sync；顶层生成副本用.git/info/exclude的本地规则管理，不删除资料、不建立另一套提交历史。用户后续优化仍需在实际仓库新功能分支开展，先读docs/PROJECT_STATUS.md，不要把已完成的首轮实现重装或重写。
+
+本轮检查点验证：23项完整单元测试通过；统一诊断入口重放三数据集，原始logits与各组件正确数完全复现，验证目录 `/root/autodl-tmp/project_R/runs/rdss_diagnosis_20261020_232159`。日志在project_R/logs/rdss_checkpoint_tests_20261020.log与rdss_checkpoint_replay_20261020.log。

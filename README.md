@@ -1,3 +1,11 @@
+# RDSS 毕业设计实验仓库
+
+基于 [TDA](https://github.com/kdiAAA/TDA) 构建免训练的动态语义选择与语义缓存。首轮实现、对照实验和问题诊断已归档，下一轮重点为判别性评分与动态更新。
+
+当前进度、结果和后续顺序见 [项目状态](docs/PROJECT_STATUS.md)，已有服务器环境与操作约定见 [AGENTS.md](AGENTS.md)，原因分析见 [诊断报告](docs/rdss-diagnosis.md)。复用已安装环境；实验数据、结果与私有配置保留在本地并忽略。下文保留原始TDA说明与作者信息。
+
+---
+
 # Efficient Test-Time Adaptation of Vision-Language Models
 [![Website](https://img.shields.io/badge/Project-Website-87CEEB)](https://kdiaaa.github.io/tda/)
 [![paper](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](http://arxiv.org/abs/2403.18293)

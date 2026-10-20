@@ -1,0 +1,413 @@
+{
+  "dataset": "Oxford Flowers-102",
+  "classes": [
+    {
+      "name": "pink primrose",
+      "hint": ""
+    },
+    {
+      "name": "hard-leaved pocket orchid",
+      "hint": ""
+    },
+    {
+      "name": "canterbury bells",
+      "hint": ""
+    },
+    {
+      "name": "sweet pea",
+      "hint": ""
+    },
+    {
+      "name": "english marigold",
+      "hint": ""
+    },
+    {
+      "name": "tiger lily",
+      "hint": ""
+    },
+    {
+      "name": "moon orchid",
+      "hint": ""
+    },
+    {
+      "name": "bird of paradise",
+      "hint": ""
+    },
+    {
+      "name": "monkshood",
+      "hint": ""
+    },
+    {
+      "name": "globe thistle",
+      "hint": ""
+    },
+    {
+      "name": "snapdragon",
+      "hint": ""
+    },
+    {
+      "name": "colt's foot",
+      "hint": ""
+    },
+    {
+      "name": "king protea",
+      "hint": ""
+    },
+    {
+      "name": "spear thistle",
+      "hint": ""
+    },
+    {
+      "name": "yellow iris",
+      "hint": ""
+    },
+    {
+      "name": "globe-flower",
+      "hint": ""
+    },
+    {
+      "name": "purple coneflower",
+      "hint": ""
+    },
+    {
+      "name": "peruvian lily",
+      "hint": ""
+    },
+    {
+      "name": "balloon flower",
+      "hint": ""
+    },
+    {
+      "name": "giant white arum lily",
+      "hint": ""
+    },
+    {
+      "name": "fire lily",
+      "hint": ""
+    },
+    {
+      "name": "pincushion flower",
+      "hint": ""
+    },
+    {
+      "name": "fritillary",
+      "hint": ""
+    },
+    {
+      "name": "red ginger",
+      "hint": ""
+    },
+    {
+      "name": "grape hyacinth",
+      "hint": ""
+    },
+    {
+      "name": "corn poppy",
+      "hint": ""
+    },
+    {
+      "name": "prince of wales feathers",
+      "hint": ""
+    },
+    {
+      "name": "stemless gentian",
+      "hint": ""
+    },
+    {
+      "name": "artichoke",
+      "hint": ""
+    },
+    {
+      "name": "sweet william",
+      "hint": ""
+    },
+    {
+      "name": "carnation",
+      "hint": ""
+    },
+    {
+      "name": "garden phlox",
+      "hint": ""
+    },
+    {
+      "name": "love in the mist",
+      "hint": ""
+    },
+    {
+      "name": "mexican aster",
+      "hint": ""
+    },
+    {
+      "name": "alpine sea holly",
+      "hint": ""
+    },
+    {
+      "name": "ruby-lipped cattleya",
+      "hint": ""
+    },
+    {
+      "name": "cape flower",
+      "hint": ""
+    },
+    {
+      "name": "great masterwort",
+      "hint": ""
+    },
+    {
+      "name": "siam tulip",
+      "hint": ""
+    },
+    {
+      "name": "lenten rose",
+      "hint": ""
+    },
+    {
+      "name": "barbeton daisy",
+      "hint": ""
+    },
+    {
+      "name": "daffodil",
+      "hint": ""
+    },
+    {
+      "name": "sword lily",
+      "hint": ""
+    },
+    {
+      "name": "poinsettia",
+      "hint": ""
+    },
+    {
+      "name": "bolero deep blue",
+      "hint": ""
+    },
+    {
+      "name": "wallflower",
+      "hint": ""
+    },
+    {
+      "name": "marigold",
+      "hint": ""
+    },
+    {
+      "name": "buttercup",
+      "hint": ""
+    },
+    {
+      "name": "oxeye daisy",
+      "hint": ""
+    },
+    {
+      "name": "common dandelion",
+      "hint": ""
+    },
+    {
+      "name": "petunia",
+      "hint": ""
+    },
+    {
+      "name": "wild pansy",
+      "hint": ""
+    },
+    {
+      "name": "primula",
+      "hint": ""
+    },
+    {
+      "name": "sunflower",
+      "hint": ""
+    },
+    {
+      "name": "pelargonium",
+      "hint": ""
+    },
+    {
+      "name": "bishop of llandaff",
+      "hint": ""
+    },
+    {
+      "name": "gaura",
+      "hint": ""
+    },
+    {
+      "name": "geranium",
+      "hint": ""
+    },
+    {
+      "name": "orange dahlia",
+      "hint": ""
+    },
+    {
+      "name": "pink-yellow dahlia",
+      "hint": ""
+    },
+    {
+      "name": "cautleya spicata",
+      "hint": ""
+    },
+    {
+      "name": "japanese anemone",
+      "hint": ""
+    },
+    {
+      "name": "black-eyed susan",
+      "hint": ""
+    },
+    {
+      "name": "silverbush",
+      "hint": ""
+    },
+    {
+      "name": "californian poppy",
+      "hint": ""
+    },
+    {
+      "name": "osteospermum",
+      "hint": ""
+    },
+    {
+      "name": "spring crocus",
+      "hint": ""
+    },
+    {
+      "name": "bearded iris",
+      "hint": ""
+    },
+    {
+      "name": "windflower",
+      "hint": ""
+    },
+    {
+      "name": "tree poppy",
+      "hint": ""
+    },
+    {
+      "name": "gazania",
+      "hint": ""
+    },
+    {
+      "name": "azalea",
+      "hint": ""
+    },
+    {
+      "name": "water lily",
+      "hint": ""
+    },
+    {
+      "name": "rose",
+      "hint": ""
+    },
+    {
+      "name": "thorn apple",
+      "hint": ""
+    },
+    {
+      "name": "morning glory",
+      "hint": ""
+    },
+    {
+      "name": "passion flower",
+      "hint": ""
+    },
+    {
+      "name": "lotus",
+      "hint": ""
+    },
+    {
+      "name": "toad lily",
+      "hint": ""
+    },
+    {
+      "name": "anthurium",
+      "hint": ""
+    },
+    {
+      "name": "frangipani",
+      "hint": ""
+    },
+    {
+      "name": "clematis",
+      "hint": ""
+    },
+    {
+      "name": "hibiscus",
+      "hint": ""
+    },
+    {
+      "name": "columbine",
+      "hint": ""
+    },
+    {
+      "name": "desert-rose",
+      "hint": ""
+    },
+    {
+      "name": "tree mallow",
+      "hint": ""
+    },
+    {
+      "name": "magnolia",
+      "hint": ""
+    },
+    {
+      "name": "cyclamen",
+      "hint": ""
+    },
+    {
+      "name": "watercress",
+      "hint": ""
+    },
+    {
+      "name": "canna lily",
+      "hint": ""
+    },
+    {
+      "name": "hippeastrum",
+      "hint": ""
+    },
+    {
+      "name": "bee balm",
+      "hint": ""
+    },
+    {
+      "name": "ball moss",
+      "hint": ""
+    },
+    {
+      "name": "foxglove",
+      "hint": ""
+    },
+    {
+      "name": "bougainvillea",
+      "hint": ""
+    },
+    {
+      "name": "camellia",
+      "hint": ""
+    },
+    {
+      "name": "mallow",
+      "hint": ""
+    },
+    {
+      "name": "mexican petunia",
+      "hint": ""
+    },
+    {
+      "name": "bromelia",
+      "hint": ""
+    },
+    {
+      "name": "blanket flower",
+      "hint": ""
+    },
+    {
+      "name": "trumpet creeper",
+      "hint": ""
+    },
+    {
+      "name": "blackberry lily",
+      "hint": ""
+    }
+  ]
+}
