@@ -149,6 +149,8 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 
 ## 固定语义缓存功能分支
 
+用户随后明确要求提交并push此基线，再新建分支完成首轮RDSS；该要求覆盖下文此前暂不提交代码的状态。基线分支为 `codex/fixed-semantic-cache-baseline`，后续RDSS分支为 `codex/rdss-first-round`。首轮参数固定后做配对测试，不启动描述生成或安装依赖。
+
 2026-10-20用户明确授权新建功能分支、修改代码并运行固定语义缓存基线，要求直接提交AGENTS.md。实际仓库分支为 `codex/fixed-semantic-cache-baseline`，起点main的e697fb0；现有AGENTS初次单独提交22063ca。功能代码保留在该分支工作区，不自动提交或push。
 
 新增 `semantic_cache.py`、`experiments/evaluate_fixed_semantic.py` 和 `tests/test_fixed_semantic.py`。模板原型保持不变，伪标签、熵和视觉缓存写入仅由模板分支驱动。每类100条已有单位文本向量等权平均并归一化，形成固定语义原型；两路文本均使用100倍相似度尺度。最终分数为模板TDA分数加eta乘语义分数，首次eta=1。没有动态筛选或修改原TDA源码，没有新依赖。
