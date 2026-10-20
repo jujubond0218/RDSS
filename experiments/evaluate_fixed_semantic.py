@@ -20,8 +20,8 @@ PREVIOUS = ROOT/'runs/flowers_cupl_manual_20261020_120643'
 DESCRIPTIONS = ROOT/'runs/flowers_broad100_all_20261020_165242'
 sys.path.insert(0, str(REPO))
 from semantic_cache import FixedSemanticCache, fuse_semantic_logits
-from tda_runner import update_cache, compute_cache_logits
-from utils import get_config_file, softmax_entropy, get_entropy
+from visual_cache import TemplateVisualCache
+from utils import get_config_file
 
 
 def digest(path):
@@ -63,6 +63,7 @@ def main():
     for source, target in [(DESCRIPTIONS/'prompts_all.json','prompts_all.json'),
                            (PREVIOUS/'oxford_flowers.yaml','oxford_flowers.yaml'),
                            (REPO/'semantic_cache.py','semantic_cache.py'),
+                           (REPO/'visual_cache.py','visual_cache.py'),
                            (REPO/'tda_runner.py','tda_runner_source.py'),
                            (REPO/'tests/test_fixed_semantic.py','test_fixed_semantic.py'),
                            (Path(__file__),'evaluate_fixed_semantic.py')]:
@@ -81,8 +82,8 @@ def main():
     assert torch.equal(cache.prototypes, previous_semantic), 'Semantic prototype changed from previous full100 experiment'
     torch.save({'classnames':names,'prototypes':cache.prototypes.cpu()},run/'semantic_prototypes.pt')
     cfg = get_config_file(str(REPO/'configs'), 'oxford_flowers')
-    positive, negative = {}, {}
-    pos, neg = cfg['positive'], cfg['negative']
+    visual = TemplateVisualCache(template, cfg)
+    positive, negative = visual.positive, visual.negative
     predictions = {'template_tda':[], 'fixed_semantic':[]}
     score_parts = {n:[] for n in ('template','positive','negative','semantic','template_tda','fixed_semantic')}
     trace = []
@@ -90,24 +91,10 @@ def main():
     loop_started = time.perf_counter()
     for step in tqdm(range(len(images)), desc='Template TDA + fixed semantics'):
         image = images[step:step+1]
-        original = 100. * image @ template
-        loss = softmax_entropy(original)
-        probabilities = original.softmax(1)
-        pseudo = int(original.argmax(1))
-        entropy = get_entropy(loss, template)
-        if pos['enabled']:
-            update_cache(positive, pseudo, [image,loss], pos['shot_capacity'])
-        if neg['enabled'] and neg['entropy_threshold']['lower'] < entropy < neg['entropy_threshold']['upper']:
-            update_cache(negative, pseudo, [image,loss,probabilities], neg['shot_capacity'], True)
-        pos_logits, neg_logits = torch.zeros_like(original), torch.zeros_like(original)
-        tda = original.clone()
-        if pos['enabled'] and positive:
-            pos_logits = compute_cache_logits(image,positive,pos['alpha'],pos['beta'],template)
-            tda += pos_logits
-        if neg['enabled'] and negative:
-            neg_logits = compute_cache_logits(image,negative,neg['alpha'],neg['beta'],template,
-                                              (neg['mask_threshold']['lower'],neg['mask_threshold']['upper']))
-            tda -= neg_logits
+        observation = visual.predict(image)
+        original, tda = observation.template, observation.tda
+        pos_logits, neg_logits = observation.positive, observation.negative
+        pseudo, entropy = observation.pseudo_label, observation.entropy
         semantic = cache.logits(image)
         zero_control = fuse_semantic_logits(tda, semantic, 0.)
         assert torch.equal(zero_control, tda)

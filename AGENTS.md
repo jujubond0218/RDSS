@@ -117,7 +117,7 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 
 当前仓库的 `configs/caltech101.yaml` 缺少 `negative.mask_threshold.upper`。完整测试使用上面结果目录内的配置补上 `upper: 1.0`，与官方当前配置一致；算法代码和仓库原配置未修改。不要直接使用缺字段的旧配置，也不要关闭负缓存来绕过错误。最初 16 张图片的检查没有覆盖到负缓存检索触发条件。
 
-2026-10-20 验证结果：`pip check` 通过，CUDA 可用，ViT-B/16 加载成功。完整 Caltech101 baseline 已完成：2465 张、100 类，Top-1 为 94.08%，论文 Table 3 对应值为 94.24%，相差 -0.16 个百分点；接近但没有精确复现。测试循环约 31 秒，含启动约 42.86 秒。本次结果目录为 `/root/autodl-tmp/project_R/runs/caltech101_vitb16_20261020_105422`，含 `report.md`、`metrics.json`、`resources.csv`、`test.log`、`manifest.json` 和实际运行配置。RDSS 改进尚未实现。
+2026-10-20 验证结果：`pip check` 通过，CUDA 可用，ViT-B/16 加载成功。完整 Caltech101 baseline 已完成：2465 张、100 类，Top-1 为 94.08%，论文 Table 3 对应值为 94.24%，相差 -0.16 个百分点；接近但没有精确复现。测试循环约 31 秒，含启动约 42.86 秒。本次结果目录为 `/root/autodl-tmp/project_R/runs/caltech101_vitb16_20261020_105422`，含 `report.md`、`metrics.json`、`resources.csv`、`test.log`、`manifest.json` 和实际运行配置。该记录为原始TDA验证；后续RDSS实现见本文末尾。
 
 ## 已完成的 CuPL 对照实验
 
@@ -151,10 +151,24 @@ WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 \
 
 用户随后明确要求提交并push此基线，再新建分支完成首轮RDSS；该要求覆盖下文此前暂不提交代码的状态。基线分支为 `codex/fixed-semantic-cache-baseline`，后续RDSS分支为 `codex/rdss-first-round`。首轮参数固定后做配对测试，不启动描述生成或安装依赖。
 
-2026-10-20用户明确授权新建功能分支、修改代码并运行固定语义缓存基线，要求直接提交AGENTS.md。实际仓库分支为 `codex/fixed-semantic-cache-baseline`，起点main的e697fb0；现有AGENTS初次单独提交22063ca。功能代码保留在该分支工作区，不自动提交或push。
+2026-10-20用户明确授权新建功能分支、修改代码并运行固定语义缓存基线，要求直接提交AGENTS.md。实际仓库分支为 `codex/fixed-semantic-cache-baseline`，起点main的e697fb0；现有AGENTS初次单独提交22063ca。固定语义功能已按后续授权提交为8f66b71；push的当前状态见首轮RDSS记录。
 
 新增 `semantic_cache.py`、`experiments/evaluate_fixed_semantic.py` 和 `tests/test_fixed_semantic.py`。模板原型保持不变，伪标签、熵和视觉缓存写入仅由模板分支驱动。每类100条已有单位文本向量等权平均并归一化，形成固定语义原型；两路文本均使用100倍相似度尺度。最终分数为模板TDA分数加eta乘语义分数，首次eta=1。没有动态筛选或修改原TDA源码，没有新依赖。
 
 4项单元测试通过，Flowers-102完整2463张配对评估完成。结果服务器目录 `/root/autodl-tmp/project_R/runs/flowers_fixed_semantic_20261020_194908`，本地results同名副本。模板TDA对照71.4982%（1761），固定语义基线73.6500%（1814），类别平均72.3345%。相对模板纠正92、损坏39，净多53张（+2.1518个百分点）。eta=0的2463条预测与此前模板TDA逐张一致；语义原型与此前100句融合原型逐元素一致；融合求和检查通过。之前74.4214%（1833）是替换模板的另一实验条件。
 
 复用ViT-B/16既有图像特征、种子1顺序、描述向量和原Flowers配置，不重复编码、不调用API、不安装环境。重放约5.98秒，总脚本约6.69秒，不含特征提取。保存metrics、逐样本预测、视觉缓存轨迹、各路logits、语义原型、输入与源码快照。运行入口为仓库内 `experiments/evaluate_fixed_semantic.py --semantic-weight 1`，使用已有独立解释器和本文的运行环境变量。说明见 `docs/flowers102-fixed-semantic-results.md`。
+
+## 首轮 RDSS 功能分支与复现
+
+用户于本轮明确授权提交并推送固定语义基线，再新开分支完成首轮 RDSS。基线提交 `8f66b71299b6cc415f458ec8150a2d3efb6a43c7` 位于 `codex/fixed-semantic-cache-baseline`；本轮分支为 `codex/rdss-first-round`。基线 push 暂被认证阻断：本机 Git 无凭据、已连接 GitHub 的写接口返回403；用户已收到认证说明，权限就绪后再正常push。不要把本地提交当作已推送。
+
+本地另有用于同步 Git 的镜像 `C:\Users\Administrator\Documents\ChatGPT\毕设\tmp\rdss-sync`，origin与服务器相同。实际已有环境、数据和代码仍以服务器路径为准；镜像不含模型与数据。
+
+实现：`rdss.py` 管理每类近期可信视觉证据及相关性/判别性/冗余筛选；`visual_cache.py` 共用原始TDA计算；`experiments/evaluate_rdss.py` 重放已保存的Flowers流并做四条件配对实验。未修改原始tda_runner.py，不需要装新依赖或重新生成描述。
+
+首轮参数：每类全部100条候选，k=8，近期可信视觉队列上限32，按同类接收顺序乘0.9衰减；模板归一化熵<=0.2且模板/TDA预测一致才更新；混淆类为当前模板其他top3中已有证据者；贪心评分Rel+Disc-0.1Red。先预测再更新语义。TDA原有低熵缓存保持不变，近期队列用于语义证据；未接收证据的类别使用全量融合原型。候选库始终完整保留，旧描述可再次入选。
+
+11项单元测试通过。完整Flowers-102、2463张、ViT-B/16、种子1结果：模板TDA71.4982%（1761），固定全量语义73.6500%（1814），动态相关性Top-k73.6906%（1815），完整RDSS73.2034%（1803）。RDSS相对固定纠正52、新增错误63，净少11张；原样保存本轮结果，不据此测试集反复找参数。
+
+服务器结果 `/root/autodl-tmp/project_R/runs/flowers_rdss_first_20261020_201102`，运行日志 `/root/autodl-tmp/project_R/logs/flowers_rdss_first_20261020.log`，本地results同名副本。方法、运行命令和结果见 `docs/rdss-first-round.md`。继续使用本文已有独立解释器和运行环境变量；入口复用已存Flowers视觉特征与描述向量，时间不包含重新编码。完整逐次选择在semantic_updates.jsonl，最终原句在final_selections.json。
