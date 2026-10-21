@@ -15,7 +15,7 @@ import torch
 from tqdm import tqdm
 
 from evaluate_fixed_semantic import ROOT, REPO, PREVIOUS, DESCRIPTIONS, accuracy, digest, write_json
-from evaluate_rdss import PARAMS
+from evaluate_rdss import COMMON as PARAMS
 import clip
 from clip.simple_tokenizer import SimpleTokenizer
 from rdss import RDSSCache
@@ -126,7 +126,7 @@ def main():
             scores = {'template_tda':obs.tda}
             for level in LEVELS:
                 scores[f'fixed_add{level}'] = fuse_semantic_logits(obs.tda,fixed[level].logits(image),1.)
-                scores[f'rdss_add{level}'] = fuse_semantic_logits(obs.tda,models[level].logits(image),1.)
+                scores[f'rdss_add{level}'] = fuse_semantic_logits(obs.tda,models[level].logits(image, step),1.)
             for name,score in scores.items():
                 predictions[name].append(int(score.argmax(1))); logits[name].append(score.cpu())
             consistent = obs.pseudo_label==int(obs.tda.argmax(1))
@@ -141,7 +141,7 @@ def main():
     torch.cuda.synchronize()
     replay_seconds = time.perf_counter()-replay_started
     previous = list(csv.DictReader((CLEAN_RUN/'predictions.csv').open()))
-    for current,old in [('template_tda','template_tda'),('fixed_add0','fixed_semantic'),('rdss_add0','rdss')]:
+    for current,old in [('template_tda','template_tda'),('fixed_add0','fixed_semantic')]:
         assert predictions[current]==[int(r[old]) for r in previous],current+' changed'
     assert len(updates[0])==len(updates[25])==len(updates[50])==1482
     results = {n:accuracy(p,labels) for n,p in predictions.items()}
@@ -158,7 +158,7 @@ def main():
         writer.writerows([i,int(stream['dataset_indices'][i]),int(labels[i]),*(predictions[n][i] for n in predictions)] for i in range(len(labels)))
     torch.save({n:torch.cat(v) for n,v in logits.items()},run/'logits.pt')
     write_json(run/'final_selections.json',{level:{c:models[level].selected[i] for i,c in enumerate(names)} for level in LEVELS})
-    metrics={'results':results,'diagnostics':diagnostics,'checks':{'clean_predictions_match_first_round':True,
+    metrics={'results':results,'diagnostics':diagnostics,'checks':{'template_and_fixed_controls_match_first_round':True,
              'original_descriptions_preserved':True,'nested_noise_pools':True,'same_semantic_updates':True},
              'encoding_and_preparation_seconds':encoding_seconds,'replay_seconds':replay_seconds,
              'total_seconds':time.perf_counter()-started,'replay_gpu_peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,

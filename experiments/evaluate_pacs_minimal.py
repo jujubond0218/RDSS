@@ -14,7 +14,7 @@ from PIL import Image
 from tqdm import tqdm
 
 from evaluate_fixed_semantic import ROOT, REPO, write_json, digest
-from evaluate_rdss import PARAMS
+from evaluate_rdss import COMMON as PARAMS
 from pacs_description_bank import build_bank
 import clip
 from rdss import RDSSCache
@@ -99,7 +99,7 @@ def main():
         for step in tqdm(range(len(features)),desc='Paired full semantic/RDSS'):
             image=features[step:step+1]; obs=visual.predict(image)
             scores={'tda':obs.tda,'fixed_all':fuse_semantic_logits(obs.tda,fixed.logits(image),1.),
-                    'rdss':fuse_semantic_logits(obs.tda,dynamic.logits(image),1.)}
+                    'rdss':fuse_semantic_logits(obs.tda,dynamic.logits(image, step),1.)}
             for name,score in scores.items():
                 predictions[name].append(int(score.argmax(1))); logits[name].append(score.cpu())
             hard=[int(c) for c in obs.template.topk(4,dim=1).indices[0] if int(c)!=obs.pseudo_label][:3]
@@ -131,7 +131,9 @@ def main():
         writer.writerows([i,r['phase'],r['domain'],r['source_row'],r['label'],*(predictions[n][i] for n in predictions)] for i,r in enumerate(stream))
     write_json(run/'phase_selections.json',phase_selections)
     torch.save({n:torch.cat(v) for n,v in logits.items()},run/'logits.pt')
-    torch.save({'fixed':fixed.prototypes.cpu(),'rdss_final':dynamic.prototypes.cpu()},run/'semantic_prototypes.pt')
+    torch.save({'fixed':fixed.prototypes.cpu(),
+                'rdss_final':dynamic.read_prototypes(len(features)-1).cpu(),
+                'rdss_selected':dynamic.prototypes.cpu()},run/'semantic_prototypes.pt')
     metrics={'results':results,'phases':phases,'accepted_updates':len(events),
              'accepted_wrong_pseudo_labels':sum(e['class_index']!=labels[e['step']] for e in events),
              'rdss_vs_fixed':{'gained':sum(a!=y and b==y for a,b,y in zip(predictions['fixed_all'],predictions['rdss'],labels)),

@@ -1,4 +1,6 @@
 # How to install datasets
+
+> 原始TDA通用准备教程。当前服务器已准备资源及项目约定以 [ENVIRONMENT.md](ENVIRONMENT.md) 为准；不要因阅读本页重新下载、重新划分或安装已有数据。
 ### Acknowledgement: We extend our gratitude to the authors of [CoOp/CoCoOp](https://github.com/KaiyangZhou/CoOp/blob/main/DATASETS.md#how-to-install-datasets) for their foundational work on data preparation instructions. In this project, we have adopted their data preparation format, implementing certain modifications to better suit our needs.
 
 We suggest putting all datasets under the same folder (say `$DATA`) to ease management and following the instructions below to organize datasets to avoid modifying the source code. The file structure looks like
@@ -225,3 +227,4 @@ The directory structure should look like
 imagenet-rendition/
 |–– imagenet-r/ # contains 200 folders whose names have the format of n*
 |–– classnames.txt
+```

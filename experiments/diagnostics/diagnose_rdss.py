@@ -3,6 +3,7 @@ from collections import deque
 from datetime import datetime
 import csv
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -14,7 +15,12 @@ from tqdm import tqdm
 ROOT=Path('/root/autodl-tmp/project_R')
 REPO=ROOT/'RDSS'
 sys.path.insert(0,str(REPO))
-from rdss import RDSSCache
+# This diagnostic reproduces the archived first round, not the current algorithm.
+HISTORICAL_SOURCE = ROOT/'runs/flowers_rdss_first_20261020_201102/rdss.py'
+historical_spec = importlib.util.spec_from_file_location('rdss_first_round', HISTORICAL_SOURCE)
+historical_module = importlib.util.module_from_spec(historical_spec)
+historical_spec.loader.exec_module(historical_module)
+RDSSCache = historical_module.RDSSCache
 from semantic_cache import FixedSemanticCache
 
 
@@ -149,7 +155,7 @@ def main():
     output=ROOT/'runs'/('rdss_diagnosis_'+stamp);output.mkdir()
     (ROOT/'runs/latest_rdss_diagnosis.txt').write_text(str(output)+'\n')
     (output/'diagnose_rdss.py').write_bytes(Path(__file__).read_bytes())
-    (output/'algorithm_sha256.txt').write_text(hashlib.sha256((REPO/'rdss.py').read_bytes()).hexdigest()+'\n')
+    (output/'algorithm_sha256.txt').write_text(hashlib.sha256(HISTORICAL_SOURCE.read_bytes()).hexdigest()+'\n')
     print('RUN_DIR',output,flush=True)
     summaries={}
     for name in ['flowers_rdss_first_20261020_201102','pacs_minimal_shift_20261020_210546','nico_minimal_shift_20261020_220735']:

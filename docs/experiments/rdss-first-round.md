@@ -1,5 +1,7 @@
 # 首轮 RDSS：实现与复现
 
+> 历史记录：2026-10-21 用户要求在同一分支继续优化，当前 `rdss.py` 和 `experiments/evaluate_rdss.py` 已更新为第二版。本文描述的是检查点 `d3cb465` 的首轮方法；首轮原始源码与结果保存在下文结果目录中。当前入口与协议见 [第二版报告](rdss-v2.md)；历史组件诊断入口明确读取首轮结果中的源码快照。
+
 代码分支：`codex/rdss-first-round`，基于固定语义基线提交 `8f66b71299b6cc415f458ec8150a2d3efb6a43c7`。基线已通过本机 Git 登录成功推送到 origin。首轮 RDSS 实现提交为 `a54f6d6a0ed914c1c37a50b7a8189e8f3a2b92ee`，本分支同步至 origin。
 
 ## 整体流程
@@ -24,15 +26,9 @@ TDA 原本保留低熵视觉样本，不能保证跟随近期变化，因此另�
 
 使用同一份 ViT-B/16 图像特征、种子 1 的 2463 张顺序、每类 100 条描述向量和 Flowers 配置，复用已保存特征；运行时间不包含图像和文本编码。真实标签只用于最终计分与输出预测表。
 
-## 运行
+## 历史复现入口
 
-```bash
-cd /root/autodl-tmp/project_R/RDSS
-HOME=/root/autodl-tmp/project_R/runtime-home PYTHONNOUSERSITE=1 PYTHONPATH= WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 /root/autodl-tmp/project_R/env/bin/python -B -m unittest discover -s tests -p 'test_*.py' -v
-HOME=/root/autodl-tmp/project_R/runtime-home PYTHONNOUSERSITE=1 PYTHONPATH= WANDB_MODE=disabled CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 /root/autodl-tmp/project_R/env/bin/python -B experiments/evaluate_rdss.py
-```
-
-入口当前直接复用本项目已存的 Flowers 特征路径，运行前按 AGENTS.md 检查已有资源。结果目录指针为 `/root/autodl-tmp/project_R/runs/latest_flowers_rdss_first.txt`。
+本文描述2026-10-20首轮协议，当前同名仓库脚本已经更新，不能直接执行当前 `experiments/evaluate_rdss.py` 冒充首轮复跑。首轮原始源码、配置与结果保留在下文结果目录及Git检查点 `d3cb465`；当前 `experiments/diagnostics/diagnose_rdss.py` 明确读取旧源码快照，用于精确重放历史组件。当前第二版运行方法见其报告。
 
 ## 本轮结果
 

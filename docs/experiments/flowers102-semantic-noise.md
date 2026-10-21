@@ -1,5 +1,7 @@
 # Flowers-102 属性错配噪声实验
 
+> 历史实验：本文准确率与协议属于2026-10-20首轮源码。当前同名运行脚本已接入第二版，不能直接按新代码复跑并称为首轮复现；使用保存的源码快照或Git检查点。当前方法见 [第二版报告](rdss-v2.md)。
+
 2026-10-20，分支 `codex/rdss-first-round`。入口 `experiments/evaluate_semantic_noise.py`。本轮源码与记录已随实验检查点归档，后续状态见PROJECT_STATUS.md。
 
 ## 构造与公平比较

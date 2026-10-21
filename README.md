@@ -1,8 +1,10 @@
 # RDSS 毕业设计实验仓库
 
-基于 [TDA](https://github.com/kdiAAA/TDA) 构建免训练的动态语义选择与语义缓存。首轮实现、对照实验和问题诊断已归档，下一轮重点为判别性评分与动态更新。
+基于 [TDA](https://github.com/kdiAAA/TDA) 研究可信视觉证据驱动的RDSS语义选择与动态语义缓存。论文保持免反传和视觉/语义双缓存主线，重点为可解释的方法贡献、受控消融与适用边界，不预设必须涨点。
 
-当前进度、结果和后续顺序见 [项目状态](docs/PROJECT_STATUS.md)，已有服务器环境与操作约定见 [AGENTS.md](AGENTS.md)，原因分析见 [诊断报告](docs/rdss-diagnosis.md)。复用已安装环境；实验数据、结果与私有配置保留在本地并忽略。下文保留原始TDA说明与作者信息。
+先读 [项目状态](docs/PROJECT_STATUS.md)，后续方案见 [研究计划](docs/semantic-adaptation-experiment-plan.md)，最新文献见 [文献对照](docs/RELATED_WORK.md)。当前实现与结果见 [第二版报告](docs/experiments/rdss-v2.md)，历史结果见 [实验索引](docs/EXPERIMENT_INDEX.md)。操作约定见 [AGENTS.md](AGENTS.md)，已安装环境与数据见 [ENVIRONMENT.md](docs/environment/ENVIRONMENT.md)。
+
+第二版与文档整理按用户授权归档，活动分支和后续开发状态以项目状态页为准。数据、模型、结果大文件与私有配置保持忽略。下文保留原始TDA说明与作者信息，其安装与运行教程不是本项目重新安装指令；尤其WandB与Caltech配置按现有环境文档执行。
 
 ---
 
@@ -16,7 +18,7 @@
 Official implementation of the paper: "Efficient Test-Time Adaptation of Vision-Language Models" [CVPR 2024].
 
 ## Overview
-![abstract figure](docs/main_figure.png)
+![abstract figure](docs/assets/main_figure.png)
 > **<p align="justify"> Abstract:** Test-time adaptation with pre-trained vision-language models has attracted increasing attention for tackling distribution shifts during the test time. Though prior studies have achieved very promising performance, they involve intensive computation which is severely unaligned with test-time adaptation. We design TDA, a training-free dynamic adapter that enables effective and efficient test-time adaptation with vision-language models. TDA works with a lightweight key-value cache that maintains a dynamic queue with few-shot pseudo labels as values and the corresponding test-sample features as keys. Leveraging the key-value cache, TDA allows adapting to test data gradually via progressive pseudo label refinement which is super-efficient without incurring any backpropagation. In addition, we introduce negative pseudo labeling that alleviates the adverse impact of pseudo label noises by assigning pseudo labels to certain negative classes when the model is uncertain about its pseudo label predictions. Extensive experiments over two benchmarks demonstrate TDA’s superior effectiveness and efficiency as compared with the state-of-the-art.
 
 ## Main Contributions
@@ -44,7 +46,7 @@ pip install -r requirements.txt
 ```
 
 ### Dataset
-To set up all required datasets, kindly refer to the guidance in [DATASETS.md](docs/DATASETS.md), which incorporates steps for two benchmarks.
+To set up all required datasets, kindly refer to the guidance in [DATASETS.md](docs/environment/DATASETS.md), which incorporates steps for two benchmarks.
 
 ## Run TDA
 ### Configs
